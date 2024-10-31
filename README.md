@@ -1,38 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Order Status Tracker
+
+A Next.js application for tracking order status with PostgreSQL database.
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- PostgreSQL database (or Supabase account)
 
 ## Getting Started
 
-First, run the development server:
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/yourusername/order-status-tracker.git
+cd order-status-tracker
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. **Set up environment variables**
+
+```bash
+# Create a .env file in the root directory and add:
+DATABASE_URL="your_database_connection_string"
+```
+
+4. **Set up Prisma**
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# Push schema to database
+npx prisma db push
+
+# (Optional) If you want to view/edit data
+npx prisma studio
+```
+
+5. **Run the development server**
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+If you need to modify the database connection:
 
-## Learn More
+1. Update the `DATABASE_URL` in your `.env` file
+2. Regenerate Prisma client:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx prisma generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Push schema changes:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx prisma db push
+```
 
-## Deploy on Vercel
+## Database Schema
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application uses the following schema:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# Mini-Order-Status-Tracker" 
-"# Mini-Order-Status-Tracker" 
+```prisma
+model Order {
+  id              String         @id @default(cuid())
+  customerName    String
+  address         String
+  status          OrderStatus    @default(PENDING)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  orderLineItems  OrderLineItem[]
+}
+
+model OrderLineItem {
+  id          String    @id @default(cuid())
+  productName String
+  quantity    Int
+  price       Float
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+```
+
+## Features
+
+- Create and manage orders
+- Track order status
+- View order details including line items
+- Pagination support
+- Real-time status updates
+
+## Built With
+
+- [Next.js](https://nextjs.org/)
+- [Prisma](https://www.prisma.io/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [tRPC](https://trpc.io/)
+- [TanStack Table](https://tanstack.com/table/v8)
+- [Tailwind CSS](https://tailwindcss.com/)

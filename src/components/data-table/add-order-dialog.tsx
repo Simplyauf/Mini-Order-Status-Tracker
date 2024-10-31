@@ -44,20 +44,26 @@ export function AddOrderDialog({
   onOpenChange,
   onSubmit,
 }: AddOrderDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     customerName: "",
     address: "",
     orderLineItems: [{ productName: "", quantity: 1, price: 0 }],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      customerName: "",
-      address: "",
-      orderLineItems: [{ productName: "", quantity: 1, price: 0 }],
-    });
+    try {
+      setIsSubmitting(true);
+      await onSubmit(formData);
+      setFormData({
+        customerName: "",
+        address: "",
+        orderLineItems: [{ productName: "", quantity: 1, price: 0 }],
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addLineItem = () => {
@@ -100,6 +106,7 @@ export function AddOrderDialog({
           <div className="space-y-2">
             <label>Customer Name</label>
             <Input
+              disabled={isSubmitting}
               value={formData.customerName}
               onChange={(e) =>
                 setFormData({ ...formData, customerName: e.target.value })
@@ -110,6 +117,7 @@ export function AddOrderDialog({
           <div className="space-y-2">
             <label>Address</label>
             <Input
+              disabled={isSubmitting}
               value={formData.address}
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
@@ -121,7 +129,12 @@ export function AddOrderDialog({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <label>Order Items</label>
-              <Button type="button" variant="outline" onClick={addLineItem}>
+              <Button
+                disabled={isSubmitting}
+                type="button"
+                variant="outline"
+                onClick={addLineItem}
+              >
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Add Item
               </Button>
@@ -130,6 +143,7 @@ export function AddOrderDialog({
             {formData.orderLineItems.map((item, index) => (
               <div key={index} className="flex gap-2 items-start">
                 <Input
+                  disabled={isSubmitting}
                   placeholder="Product Name"
                   value={item.productName}
                   onChange={(e) =>
@@ -138,6 +152,7 @@ export function AddOrderDialog({
                   required
                 />
                 <Input
+                  disabled={isSubmitting}
                   type="number"
                   placeholder="Quantity"
                   value={item.quantity}
@@ -149,6 +164,7 @@ export function AddOrderDialog({
                   className="w-24"
                 />
                 <Input
+                  disabled={isSubmitting}
                   type="number"
                   placeholder="Price"
                   value={item.price}
@@ -162,6 +178,7 @@ export function AddOrderDialog({
                 />
                 {formData.orderLineItems.length > 1 && (
                   <Button
+                    disabled={isSubmitting}
                     type="button"
                     variant="destructive"
                     size="icon"
@@ -176,7 +193,9 @@ export function AddOrderDialog({
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit">Create Order</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Order"}
+            </Button>
           </div>
         </form>
       </DialogContent>
