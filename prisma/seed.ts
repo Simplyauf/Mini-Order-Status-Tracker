@@ -52,7 +52,7 @@ async function main() {
     data: {
       customerName: "Bob Johnson",
       address: "789 Pine Rd, Village, Country",
-      status: "SHIPPED",
+      status: "COMPLETED",
       orderLineItems: {
         create: [
           {
@@ -74,7 +74,7 @@ async function main() {
     data: {
       customerName: "Alice Brown",
       address: "321 Elm St, City, Country",
-      status: "DELIVERED",
+      status: "COMPLETED",
       orderLineItems: {
         create: [
           {
